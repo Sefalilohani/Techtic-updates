@@ -3,9 +3,10 @@ import time
 import requests
 from collections import defaultdict
 
-REDASH_URL    = "https://redash.springworks.in"
-QUERY_ID      = 1994
-QUERY_API_KEY = os.environ["REDASH_API_KEY"]
+REDASH_URL     = "https://redash.springworks.in"
+QUERY_ID       = 1994
+DATA_SOURCE_ID = 5
+QUERY_API_KEY  = os.environ["REDASH_API_KEY"]
 
 SLACK_TOKEN   = os.environ["SLACK_BOT_TOKEN"]
 SLACK_CHANNEL = "C0AGRE19V6U"   # #testing-sefali
@@ -20,12 +21,20 @@ def refresh_and_get_results():
         "Authorization": f"Key {QUERY_API_KEY}",
         "Content-Type":  "application/json",
     }
+
+    # Use legacy /api/query_results endpoint (works with all Redash versions)
     resp = requests.post(
-        f"{REDASH_URL}/api/queries/{QUERY_ID}/results",
+        f"{REDASH_URL}/api/query_results",
         headers=headers,
-        json={"max_age": 0},
+        json={
+            "query_id":      QUERY_ID,
+            "max_age":       0,
+            "data_source_id": DATA_SOURCE_ID,
+            "parameters":    {},
+        },
         timeout=30,
     )
+    print(f"POST /api/query_results → {resp.status_code}")
     resp.raise_for_status()
     data = resp.json()
 
@@ -41,6 +50,7 @@ def refresh_and_get_results():
             )
             job = job_resp.json().get("job", {})
             status = job.get("status")
+            print(f"  job status={status}")
             if status == 3:
                 result_id = job["query_result_id"]
                 break
