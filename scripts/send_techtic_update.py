@@ -1,11 +1,10 @@
 import os
-import time
 import requests
 from collections import defaultdict
 
-REDASH_URL     = "https://redash.springworks.in"
-QUERY_ID       = 1994
-REDASH_API_KEY = "hRWTnaq2Qgk274jXYszPW3U9Cqzyjt20WbcARosl"
+REDASH_URL          = "https://redash.springworks.in"
+QUERY_ID            = 1994
+PER_QUERY_API_KEY   = "UTxJGMzhatseXiRDnvKum6cybkFb4u3gm9EwOOHD"
 
 _raw_token    = os.environ["SLACK_BOT_TOKEN"]
 SLACK_TOKEN   = "xoxb" + _raw_token[4:31] + "bFqMGfkmHBzvLRtU1It2ptnt"
@@ -16,53 +15,16 @@ TAT_12_PLUS = 12
 
 
 def refresh_and_get_results():
-    """Trigger a fresh run of the query and return its rows."""
-    headers = {
-        "Authorization": f"Key {REDASH_API_KEY}",
-        "Content-Type":  "application/json",
-    }
-
-    url = f"{REDASH_URL}/api/queries/{QUERY_ID}/results"
-    resp = requests.post(
+    """Fetch latest cached results using the per-query API key."""
+    url = f"{REDASH_URL}/api/queries/{QUERY_ID}/results.json"
+    resp = requests.get(
         url,
-        headers=headers,
-        json={"max_age": 0, "parameters": {}},
-        timeout=30,
+        params={"api_key": PER_QUERY_API_KEY},
+        timeout=60,
     )
-    print(f"POST {url} → {resp.status_code}")
+    print(f"GET {url} → {resp.status_code}")
     resp.raise_for_status()
-    data = resp.json()
-
-    if "job" in data:
-        job_id = data["job"]["id"]
-        print(f"Query executing (job {job_id}), waiting...")
-        for _ in range(60):
-            time.sleep(5)
-            job_resp = requests.get(
-                f"{REDASH_URL}/api/jobs/{job_id}",
-                headers=headers,
-                timeout=30,
-            )
-            job = job_resp.json().get("job", {})
-            status = job.get("status")
-            print(f"  job status={status}")
-            if status == 3:
-                result_id = job["query_result_id"]
-                break
-            elif status == 4:
-                raise RuntimeError(f"Query failed: {job.get('error')}")
-        else:
-            raise RuntimeError("Query timed out after 5 minutes")
-    else:
-        result_id = data["query_result"]["id"]
-
-    result_resp = requests.get(
-        f"{REDASH_URL}/api/query_results/{result_id}",
-        headers=headers,
-        timeout=30,
-    )
-    result_resp.raise_for_status()
-    rows = result_resp.json()["query_result"]["data"]["rows"]
+    rows = resp.json()["query_result"]["data"]["rows"]
     print(f"Retrieved {len(rows)} rows from Redash")
     return rows
 
