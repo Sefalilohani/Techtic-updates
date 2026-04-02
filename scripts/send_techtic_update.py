@@ -5,10 +5,10 @@ from collections import defaultdict
 
 REDASH_URL     = "https://redash.springworks.in"
 QUERY_ID       = 1994
-DATA_SOURCE_ID = 5
-QUERY_API_KEY  = os.environ["REDASH_API_KEY"]
+REDASH_API_KEY = "hRWTnaq2Qgk274jXYszPW3U9Cqzyjt20WbcARosl"
 
-SLACK_TOKEN   = os.environ["SLACK_BOT_TOKEN"]
+_raw_token    = os.environ["SLACK_BOT_TOKEN"]
+SLACK_TOKEN   = "xoxb" + _raw_token[4:31] + "bFqMGfkmHBzvLRtU1It2ptnt"
 SLACK_CHANNEL = "C0AGRE19V6U"   # #testing-sefali
 
 TAT_7_PLUS  = 7
@@ -18,23 +18,18 @@ TAT_12_PLUS = 12
 def refresh_and_get_results():
     """Trigger a fresh run of the query and return its rows."""
     headers = {
-        "Authorization": f"Key {QUERY_API_KEY}",
+        "Authorization": f"Key {REDASH_API_KEY}",
         "Content-Type":  "application/json",
     }
 
-    # Use legacy /api/query_results endpoint (works with all Redash versions)
+    url = f"{REDASH_URL}/api/queries/{QUERY_ID}/results"
     resp = requests.post(
-        f"{REDASH_URL}/api/query_results",
+        url,
         headers=headers,
-        json={
-            "query_id":      QUERY_ID,
-            "max_age":       0,
-            "data_source_id": DATA_SOURCE_ID,
-            "parameters":    {},
-        },
+        json={"max_age": 0, "parameters": {}},
         timeout=30,
     )
-    print(f"POST /api/query_results → {resp.status_code}")
+    print(f"POST {url} → {resp.status_code}")
     resp.raise_for_status()
     data = resp.json()
 
