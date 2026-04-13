@@ -17,9 +17,9 @@ CC_USERS = [
     "<@U06UBBS4QHJ>",   # Armaan
     "<@UURRMS3MG>",     # Shalini
     "<@U03GURJS6SZ>",   # Anusha Kumari
-    "<U08FT9QD9U3>", 
-    "<U08HF79BTSM>",
-    "<U092KHH1MSQ>",
+    "<U08FT9QD9U3>",    # Sristy Jaydhar
+    "<U08HF79BTSM>",    # Ritu Issrani
+    "<U092KHH1MSQ>",    # Udita ​Singh
 ]
 
 SEV_ORDER = ["0-1", "2 - 3", "4 - 5", "6 - 7", "8 - 14", "15 - 30", "31 - 90", "90+"]
