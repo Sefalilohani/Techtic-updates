@@ -25,7 +25,7 @@ CC_USERS = [
 SEV_ORDER = ["0-1", "2 - 3", "4 - 5", "6 - 7", "8 - 14", "15 - 30", "31 - 90", "90+"]
 
 TAT_7_PLUS  = 7
-TAT_12_PLUS = 12
+TAT_10_PLUS = 10
 
 
 def fetch_results():
@@ -104,7 +104,7 @@ def format_pivot_table(pivot):
 def compute_crossed_days(rows):
     """Count rows per Check Name where NET TAT >= threshold."""
     counts_7  = defaultdict(int)
-    counts_12 = defaultdict(int)
+    counts_10 = defaultdict(int)
     for row in rows:
         check   = row.get("Check Name", "Unknown")
         net_tat = row.get("NET TAT")
@@ -113,9 +113,9 @@ def compute_crossed_days(rows):
         net_tat = float(net_tat)
         if net_tat >= TAT_7_PLUS:
             counts_7[check] += 1
-        if net_tat >= TAT_12_PLUS:
-            counts_12[check] += 1
-    return counts_7, counts_12
+        if net_tat >= TAT_10_PLUS:
+            counts_10[check] += 1
+    return counts_7, counts_10
 
 
 def build_message(rows):
