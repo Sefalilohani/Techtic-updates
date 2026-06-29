@@ -16,7 +16,6 @@ CC_USERS = [
     "<@U026K56UJQL>",   # Anjana
     "<@U06UBBS4QHJ>",   # Armaan
     "<@U03U23ZUPN1>",     # Sidra
-    "<@U09E0FZ8XV4>",   # Sohan
 ]
 
 SEV_ORDER = ["0-1", "2 - 3", "4 - 5", "6 - 7", "8 - 14", "15 - 30", "31 - 90", "90+"]
